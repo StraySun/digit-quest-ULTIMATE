@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36705.20
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digit quest ULTIMATE", "digit quest ULTIMATE\digit quest ULTIMATE.csproj", "{DA19A7F2-555A-4291-8A96-F81441795C92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{2F0E6051-1800-466E-8767-53F39DE00BCB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA19A7F2-555A-4291-8A96-F81441795C92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA19A7F2-555A-4291-8A96-F81441795C92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA19A7F2-555A-4291-8A96-F81441795C92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA19A7F2-555A-4291-8A96-F81441795C92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F0E6051-1800-466E-8767-53F39DE00BCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F0E6051-1800-466E-8767-53F39DE00BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F0E6051-1800-466E-8767-53F39DE00BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F0E6051-1800-466E-8767-53F39DE00BCB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {18BB159F-FC68-4470-BE0A-3D4D10842670}
+	EndGlobalSection
+EndGlobal
