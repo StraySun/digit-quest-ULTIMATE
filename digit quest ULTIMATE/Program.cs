@@ -8,10 +8,7 @@ namespace digit_quest_ULTIMATE
     {
 
 
-        // ошибки:
-        // нет возможности хила при сражении +-
-        // нет ссылки на магаз +
-        // босс сразу начинает атаковать после конца всех комнат -
+        // ост. ошибки:
         // переделать интерфейс для босса (дать имя и тд) -
         // слишком долго выводит принт -
         // фиксануть шанс процентов (особенно для комнат и мага) -
@@ -43,6 +40,7 @@ Press ENTER to start
                 if (str == "")
                 {
                     i = 1;
+                    Console.Clear();
                     StartPreGame();
                 }
                 else
@@ -149,6 +147,8 @@ Press ENTER to start
         }
         static void StartGame()
         {
+            Console.Clear();
+            string text="";
             while (roomNumber < roomCount && playerHP > 0)
             {
                 Console.WriteLine($@"
@@ -173,19 +173,32 @@ Select the action you want to perform:
                 {
                     case 0:
                         ShowStats();
+                        ENTER();
+                        Console.Clear();
                         break;
                     case 1:
+                        Console.Clear();
                         ProcessRoom(roomNumber);
                         roomNumber++;
+                        text = $@"Wait, the next room is loading..";
+                        humanType(text);
+                        Thread.Sleep(2500);
+                        Console.Clear();
                         break;
                     case 2:
                         UsePotion();
                         break;
                     case 3:
+                        Console.Clear();
                         VisitAltar();
+                        ENTER();
+                        Console.Clear();
                         break;
                     case 4:
+                        Console.Clear();
                         VisitMerchant();
+                        ENTER();
+                        Console.Clear();
                         break;
                 }
                 //roomNumber++;
@@ -262,8 +275,8 @@ Select the action you want to perform:
             while (monsterHP > 0 && playerHP > 0)
             {
                 Console.WriteLine($@"Choose:
-1. Heal
-2. Attack");
+    1. Heal
+    2. Attack");
                 string choose = Console.ReadLine();
                 switch (choose)
                 {
@@ -272,7 +285,7 @@ Select the action you want to perform:
                         playerAttack = 0;
                         monsterHP -= playerAttack;
                         playerHP -= monsterAttack;
-                        Console.WriteLine($@"U hesitated to choose a weapon and missed a hit
+                        Console.WriteLine($@"U didn't have time to choose a weapon and missed a hit
 PLayer HP: {playerHP}/{playerMaxHP} (-{monsterAttack})
 Monster HP: {monsterHP}/{monsterMaxHP} (-{playerAttack})
 ");
@@ -635,27 +648,78 @@ Well, now do whatever you want. Take care of yourself and goodbye");
             //List<string> equipments = new List<string> { "меч", "лук" };
             Console.Write("\n\n");
         }
+        static void ENTER()
+        {
+            Console.WriteLine($@"
+Press ENTER to continue");
+            string str = Console.ReadLine();
+            // game will not start until the player presses the enter key
+            for (int i = 0; i < 2; i++)
+                if (str == "")
+                {
+                    i = 1;
+                }
+                else
+                    while (str != "") str = Console.ReadLine();
+        }
         static void FightBoss()
         //– битва с финальным боссом.
         {
+            Console.Clear();
             int bossHP = 100;
+            int bossMaxHP = bossHP;
             int bossHeal = 10;
             int step = 0;
-            while (bossHP > 0)
+            Thread.Sleep(1000);
+            string text = $@"
+heh, u currently steel alive?
+Maybe u want figth with me?
+Lmao, u don't have any choice
+So, die..";
+            while (bossHP > 0 && playerHP > 0)
             {
                 if (step % 3 == 0)
                 {
                     int bossHealChance = random.Next(0, 1 + 1);
-                    bossHP += (bossHealChance==1 ? 10:0);
+                    bossHP += (bossHealChance == 1 ? 10 : 0);
+                    Console.WriteLine("Boss heal 10 HP");
                 }
+                Console.WriteLine($@"Choose:
+    1. Heal
+    2. Attack");
+                string choose = Console.ReadLine();
                 int bossDoubleAttackChance = random.Next(0, 1 + 1);
                 int bossAttack = (bossDoubleAttackChance == 0 ? 1 : 2) * random.Next(15, 25 + 1);
-                playerAttack = PlayerAttack(random.Next(10, 20 + 1), random.Next(5, 15 + 1)) + bonusAttack;
-                bossHP -= playerAttack;
-                playerHP -= bossAttack;
-                Console.WriteLine($@"   Player HP: {playerHP} (-{bossAttack})
-Boss HP: {bossHP} (-{playerAttack})");
-                step++;
+                switch (choose)
+                {
+                    case "1":
+                        UsePotion();
+                        playerAttack = 0;
+                        bossHP -= playerAttack;
+                        playerHP -= bossAttack;
+                        Console.WriteLine($@"U didn't have time to choose a weapon and missed a hit
+PLayer HP: {playerHP}/{playerMaxHP} (-{bossAttack})
+Monster HP: {bossHP}/{bossMaxHP} (-{playerAttack})
+");
+                        break;
+                    case "2":
+                        playerAttack = PlayerAttack(random.Next(10, 20 + 1), random.Next(5, 15 + 1)) + bonusAttack;
+                        bossHP -= playerAttack;
+                        playerHP -= bossAttack;
+                        Console.WriteLine($@"   Player HP: {playerHP}/{playerMaxHP} (-{bossAttack})
+Boss HP: {bossHP}/{bossMaxHP} (-{playerAttack})");
+                        step++;
+                        break;
+                    default:
+                        playerAttack = 0;
+                        bossHP -= playerAttack;
+                        playerHP -= bossAttack;
+                        Console.WriteLine($@"U hesitated to choose a weapon and missed a hit
+PLayer HP: {playerHP}/{playerMaxHP} (-{bossAttack})
+Monster HP: {bossHP}/{bossMaxHP} (-{playerAttack})
+");
+                        break;
+                }
             }
             if (playerHP <= 0) EndGame(false);
             else EndGame(true);
