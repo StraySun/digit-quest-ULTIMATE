@@ -6,6 +6,18 @@ namespace digit_quest_ULTIMATE
 {
     internal class Program
     {
+
+
+        // ошибки:
+        // нет возможности хила при сражении +-
+        // нет ссылки на магаз +
+        // босс сразу начинает атаковать после конца всех комнат -
+        // переделать интерфейс для босса (дать имя и тд) -
+        // слишком долго выводит принт -
+        // фиксануть шанс процентов (особенно для комнат и мага) -
+
+
+
         static Random random = new Random();
         static int playerAttack = 0;
         static int playerHP = 0;
@@ -15,7 +27,7 @@ namespace digit_quest_ULTIMATE
         static int potionHeal = 0;
         static int arrow = 0;
         static List<string> equipments = new List<string>();
-        static int baseAttack = 0;
+        static int bonusAttack = 0;
         static int roomCount = 15;
         static int roomNumber = 0;
         static void Main(string[] args)
@@ -78,7 +90,7 @@ Press ENTER to start
             equipments.Add("меч");
             equipments.Add("лук");
 
-            baseAttack = 0;
+            bonusAttack = 0;
             roomNumber = 0;
         }
 
@@ -161,7 +173,6 @@ Select the action you want to perform:
                 {
                     case 0:
                         ShowStats();
-                        roomNumber++;
                         break;
                     case 1:
                         ProcessRoom(roomNumber);
@@ -169,15 +180,12 @@ Select the action you want to perform:
                         break;
                     case 2:
                         UsePotion();
-                        roomNumber++;
                         break;
                     case 3:
                         VisitAltar();
-                        roomNumber++;
                         break;
                     case 4:
                         VisitMerchant();
-                        roomNumber++;
                         break;
                 }
                 //roomNumber++;
@@ -194,15 +202,16 @@ Select the action you want to perform:
             Console.WriteLine("U went to next room and...");
             Console.WriteLine("⟭⟬ ⟭⟬ ⟭⟬ ⟭⟬ ⟭⟬ ⟭⟬ ⟭⟬ ⟭⟬ ⟭⟬");
             int rand = random.Next(0, 4);
+            int roomIs = rand / 1; //need change the chance
             int meetDarkMageChance = random.Next(0, 100 + 1);
             //meet Dark Mage B4 went to new room
-            if (meetDarkMageChance % 5 == 0) MeetDarkMage();
+            if (meetDarkMageChance % 25 == 0) MeetDarkMage();
 
             // 0 - figth with monster's;
             // 1 - fall into a trap;
             // 2 - empty room;
             // 3(def) - chest
-            switch (rand)
+            switch (roomIs)
             {
                 case 0:
                     Console.WriteLine("Danger! Monster behind u!!");
@@ -232,7 +241,8 @@ Select the action you want to perform:
                     Thread.Sleep(250);
                     text = "Do u want open him? (def: 'yes')";
                     humanType(text);
-                    string ans = Console.ReadLine();
+                    string answer = Console.ReadLine();
+                    string ans = answer.ToLower();
                     bool boolean = (ans == "y" || ans == "yes" || ans == "" ? true : false);
                     if (boolean)
                     {
@@ -249,15 +259,44 @@ Select the action you want to perform:
         {
             Console.WriteLine($"Monster have {monsterHP} HP & {monsterAttack} ATK.");
             int monsterMaxHP = monsterHP;
-            while (monsterHP > 0 && playerHP>0)
+            while (monsterHP > 0 && playerHP > 0)
             {
-                playerAttack = PlayerAttack(random.Next(10, 20 + 1), random.Next(5, 15 + 1)) + baseAttack;
-                // sword/bow attack (10-20/5-15)
-                monsterHP -= playerAttack;
-                playerHP -= monsterAttack;
-                Console.Write($@"   PLayer HP: {playerHP}/{playerMaxHP} (-{monsterAttack})
-    Monster HP: {monsterHP}/{monsterMaxHP} (-{playerAttack})
+                Console.WriteLine($@"Choose:
+1. Heal
+2. Attack");
+                string choose = Console.ReadLine();
+                switch (choose)
+                {
+                    case "1":
+                        UsePotion();
+                        playerAttack = 0;
+                        monsterHP -= playerAttack;
+                        playerHP -= monsterAttack;
+                        Console.WriteLine($@"U hesitated to choose a weapon and missed a hit
+PLayer HP: {playerHP}/{playerMaxHP} (-{monsterAttack})
+Monster HP: {monsterHP}/{monsterMaxHP} (-{playerAttack})
 ");
+                        break;
+
+                    case "2":
+                        playerAttack = PlayerAttack(random.Next(10, 20 + 1), random.Next(5, 15 + 1)) + bonusAttack;
+                        // sword/bow attack (10-20/5-15)
+                        monsterHP -= playerAttack;
+                        playerHP -= monsterAttack;
+                        Console.Write($@"   PLayer HP: {playerHP}/{playerMaxHP} (-{monsterAttack})
+Monster HP: {monsterHP}/{monsterMaxHP} (-{playerAttack})
+");
+                        break;
+                    default:
+                        playerAttack = 0;
+                        monsterHP -= playerAttack;
+                        playerHP -= monsterAttack;
+                        Console.WriteLine($@"U hesitated to choose a weapon and missed a hit
+PLayer HP: {playerHP}/{playerMaxHP} (-{monsterAttack})
+Monster HP: {monsterHP}/{monsterMaxHP} (-{playerAttack})
+");
+                        break;
+                }
             }
             if (playerHP <= 0) EndGame(false);
             else Console.WriteLine("Congratulation! U win the monster");
@@ -271,13 +310,32 @@ Select the action you want to perform:
                 Console.WriteLine($@"   {i}. {equipments[i - 1]}");
             }
             int choose = int.Parse(Console.ReadLine());
-            if (choose == 1) return swordAttack;
-            else if (choose == 2)
+            // 1 - sword
+            // 2 - bow
+            switch (choose)
             {
-                arrow--;
-                return bowAttack;
+                case 1:
+                    return swordAttack;
+                case 2:
+                    {
+                        if (arrow > 0)
+                        {
+                            arrow--;
+                            return bowAttack;
+                        }
+                        else
+                        {
+                            Console.WriteLine($@"U don't have any arrows left.
+U couldn't attack and missed the attack.");
+                            return 0;
+                        }
+                    }
+                default:
+                    {
+                        Console.WriteLine($@"U hesitated to choose a weapon and missed a hit");
+                        return 0;
+                    }
             }
-            else return 0;
         }
         static int fallingToTrap()
         //falling up
@@ -294,7 +352,7 @@ Select the action you want to perform:
             int chest = (emptyChestChance >= 0 ? 1 : (cursedChestChance >= 0 ? 0 : -1));
             // 0 - cursed chest; (5%)
             // 1 - empty chest; (5%)
-            // 2(def) - common chest (90%)
+            // -1(def) - common chest (90%)
             int plusGolden = FoundGold();
             int minusHP = minusMaxHP();
             switch (chest)
@@ -395,6 +453,66 @@ U find some money, potion & arrow.
         static void VisitMerchant()
         //– покупка предметов у торговца.
         {
+            string text = $@"Hola. What do u want to buy?
+U can buy potions (10 gold) or arrows (5 gold for 3 pieces).";
+            humanType(text);
+            Console.WriteLine($@"
+Potion - 'p'/'potion'
+Arrows - 'a'/'arrows'
+Cancel - 'e'/'exit'
+");
+            string str = Console.ReadLine();
+            string purchase = str.ToLower();
+            int boolean = qwe(purchase);
+            for (int i = 0; i < 2; i++)
+                if (boolean == 0)
+                {
+                    i = 1;
+                    buyPAC(purchase);
+                }
+                else
+                    while (purchase != "" || boolean == 0)
+                    {
+                        str = Console.ReadLine();
+                        purchase = str.ToLower();
+                        boolean = qwe(purchase);
+                        if (boolean == 0) break;
+                    }
+        }
+        static int qwe(string purchase)
+        {
+            int boolean;
+            boolean = ((purchase == "p" || purchase == "potion") || (purchase == "a" || purchase == "arrow") || (purchase == "e" || purchase == "exit")) ? 0 : 1;
+            return boolean;
+        }
+        static void buyPAC(string purchase)
+        {
+            if (purchase == "p" || purchase == "potion")
+            {
+                if (gold >= 10)
+                {
+                    gold -= 10;
+                    potion++;
+                    Console.WriteLine($@"Tnks for buying
+    Potion: {potion} (+1)");
+                }
+                else Console.WriteLine($@"Ohh, u poor, gone away!");
+            }
+            else if (purchase == "a" || purchase == "arrow")
+            {
+                if (gold >= 5)
+                {
+                    gold -= 5;
+                    arrow += 3;
+                    Console.WriteLine($@"Tnks for buying
+    Arrow: {arrow} (+3)");
+                }
+                else Console.WriteLine(($@"Ohh, u poor, gone away!"));
+            }
+            else
+            {
+                Console.WriteLine("EXIT");
+            }
         }
         static void VisitAltar()
         //– усиление персонажа за золото.
@@ -422,12 +540,12 @@ Well, if u provide 10 gold, u can upgrade one of the stats to choose from.");
         {
             Console.WriteLine($@"Choose what you want to upgrade
     1. STR - stength (+5)
-    2. VIT - vitalyry (+10)");
+    2. VIT - vitalyty (+10)");
             int choose = int.Parse(Console.ReadLine());
             switch (choose)
             {
                 case 1:
-                    baseAttack += 5;
+                    bonusAttack += 5;
                     gold -= 10;
                     break;
                 case 2:
@@ -449,9 +567,8 @@ Sacrifice 10 HP to get 2 potions and 5 arrows.
 
             if (!boolean)
             {
-                text = ("WoW, and u're not a fool.");
-                humanType(text);
-                text = "Well, get ready";
+                text = ($@"WoW, and u're not a fool.
+Well, get ready");
                 humanType(text);
                 text = "1... 2... 3...";
                 int delay;
@@ -463,9 +580,8 @@ Sacrifice 10 HP to get 2 potions and 5 arrows.
                     Console.Write(text[i]);
                 }
                 Console.Write("\n");
-                text = "Tadam! Here you go, your potions and arrows";
-                humanType(text);
-                text = "Well, now do whatever you want. Take care of yourself and goodbye";
+                text = ($@"Tadam! Here you go, your potions and arrows.
+Well, now do whatever you want. Take care of yourself and goodbye");
                 humanType(text);
                 // -10HP after the exchange 
                 playerHP -= 10;
@@ -534,7 +650,7 @@ Sacrifice 10 HP to get 2 potions and 5 arrows.
                 }
                 int bossDoubleAttackChance = random.Next(0, 1 + 1);
                 int bossAttack = (bossDoubleAttackChance == 0 ? 1 : 2) * random.Next(15, 25 + 1);
-                playerAttack = PlayerAttack(random.Next(10, 20 + 1), random.Next(5, 15 + 1)) + baseAttack;
+                playerAttack = PlayerAttack(random.Next(10, 20 + 1), random.Next(5, 15 + 1)) + bonusAttack;
                 bossHP -= playerAttack;
                 playerHP -= bossAttack;
                 Console.WriteLine($@"   Player HP: {playerHP} (-{bossAttack})

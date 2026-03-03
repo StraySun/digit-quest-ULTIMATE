@@ -18,6 +18,7 @@ namespace test
         static int potionHill = 10;
         static int arrow = 100;
         static List<string> equipments = new List<string>() {"меч","лук"};
+        static bool boolean;
         static void Main(string[] args)
         {
             //string text = ("WoW, and u're not a fool.");
@@ -25,9 +26,29 @@ namespace test
             //text = "Well, get ready";
             //humanType(text);
             //text = "1... 2... 3...";
-            int bossDoubleAttackChance = random.Next(0, 1 + 1);
-            int bossAttack = (bossDoubleAttackChance==0 ? 1 : 2) * 2;
-            Console.WriteLine(bossAttack);
+            string str = Console.ReadLine();
+            string purchase = str.ToLower();
+            int boolean = qwe(purchase);
+            for (int i = 0; i < 2; i++)
+                if (boolean==0)
+                {
+                    i = 1;
+                    Console.WriteLine(1365244);
+                }
+                else
+                    while (purchase != "" || boolean == 0)
+                    {
+                        str = Console.ReadLine();
+                        purchase = str.ToLower();
+                        boolean = qwe(purchase);
+                        if (boolean == 0) break;
+                    } 
+        }
+        static int qwe(string purchase)
+        {
+            int boolean;
+            boolean = ((purchase == "p" || purchase == "potion") || (purchase == "a" || purchase == "arrow") || (purchase == "e" || purchase == "exit")) ? 0 : 1;
+            return boolean;
         }
         static void humanType(string text)
         {
